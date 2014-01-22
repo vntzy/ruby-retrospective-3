@@ -80,10 +80,6 @@ module Asm
         @instruction_pointer = @commands[@instruction_pointer].call
       end
 
-      self
-    end
-
-    def dump_registers
       REGISTERS.map { |register_name| @registers[register_name].value }
     end
 
@@ -109,6 +105,6 @@ module Asm
   end
 
   def self.asm(&block)
-    Asm.compile(&block).run.dump_registers
+    Asm.compile(&block).run
   end
 end
