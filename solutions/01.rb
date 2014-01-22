@@ -1,80 +1,40 @@
 class Integer
   def prime?
-    2.upto(pred).all? { |i| remainder(i).nonzero? } and self > 0
+    return false if self < 2
+    2.upto(pred).all? { |divisor| remainder(divisor).nonzero? }
   end
-end
 
-class Integer
   def prime_factors
-    self2 = self.abs
-    factors = []
-    while self2 != 1
-      factors << (2..self2).detect { |i| i.prime? and self2 % i == 0 }
-      self2 = self2 / factors.last
-    end
-    factors
+    return [] if abs < 2
+    divisor = 2.upto(abs).find { |divisor| remainder(divisor).zero? }
+    [divisor] + (abs / divisor).prime_factors
   end
-end
 
-class Integer
   def harmonic
-    sum = Rational(0)
-    (1..self).each { |i| sum = sum + Rational(1, i) }
-    sum
+    1.upto(self).map { |number| Rational(1, number) }.reduce(:+)
   end
-end
 
-class Integer
   def digits
-    array_for_digits = []
-    self2 = self.abs
-    while self2 != 0
-      array_for_digits << self2 % 10
-      self2 = self2 / 10
-    end
-    array_for_digits.reverse
-  end
-end
-
-class Array
-  def average
-    sum = Float(0)
-    self.each { |i| sum = sum + i }
-    return sum / self.length
-  end
-end
-
-class Array
-  def drop_every(n)
-    arraycopy = self
-    k = n
-    while n <= arraycopy.length
-      arraycopy.delete_at(n-1)
-      n = n + k - 1
-    end
-    arraycopy
+    abs.to_s.chars.map(&:to_i)
   end
 end
 
 class Array
   def frequencies
-    ar = self.uniq
-    hash = {}
-    (0..(ar.length - 1)).each do |i|
-      hash = hash.merge({ar[i] => self.count(ar[i])})
-    end
-    hash
+    Hash[uniq.map { |element| [element, count(element)] }]
   end
-end
 
-class Array
-  def combine_with(arr)
-    new_array = []
-    i = 0
-    while ( self[i] or arr[i] )
-      new_array << self[i] << arr[i]
-      i = i + 1
-    end
-    new_array.compact
+  def average
+    reduce(:+).fdiv(length)
+  end
+
+  def drop_every(n)
+    reject.with_index { |_, index| index.succ.remainder(n).zero? }
+  end
+
+  def combine_with(other)
+    common = [length, other.length].min
+    excess = self[common...length] + other[common...other.length]
+    self[0...common].zip(other[0...common]).flatten(1) + excess
   end
 end
